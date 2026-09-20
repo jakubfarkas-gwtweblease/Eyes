@@ -1,0 +1,446 @@
+<!doctype html>
+<html lang="sk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#eef3fb">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Oči">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="apple-touch-icon" href="./apple-touch-icon.png">
+<title>Očný tréning</title>
+<style>
+:root{
+  --page:#eef3fb;--page2:#f9fbff;--ink:#101521;--muted:#758196;
+  --card:#fff;--card2:#f6f8fc;--hair:rgba(20,35,64,.075);
+  --blue:#0a84ff;--indigo:#6074ff;--cyan:#62d8ff;--green:#2eb66a;
+  --green-soft:#e7f8ee;--amber:#f4a524;--amber-soft:#fff2d9;--red:#ff453a;
+  --content-shadow:0 18px 55px rgba(37,54,87,.075);
+
+  /* Safari-first Liquid Glass recipe */
+  --glass-fill:rgba(255,255,255,.13);
+  --glass-fill-strong:rgba(255,255,255,.19);
+  --glass-edge:rgba(255,255,255,.24);
+  --glass-specular:rgba(255,255,255,.86);
+  --glass-specular-soft:rgba(255,255,255,.38);
+  --glass-shadow:0 14px 36px rgba(23,38,70,.18),0 2px 8px rgba(23,38,70,.08),
+    inset 0 1px 1px rgba(255,255,255,.28),inset 0 -1px 1px rgba(12,23,48,.08);
+}
+*{box-sizing:border-box}
+html{background:var(--page);color-scheme:light}
+body{
+  margin:0;min-height:100%;color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","Segoe UI",sans-serif;
+  -webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent;overflow-x:hidden;
+  background:
+    radial-gradient(circle at 10% -8%,rgba(99,215,255,.27),transparent 25rem),
+    radial-gradient(circle at 102% 2%,rgba(126,95,255,.14),transparent 27rem),
+    radial-gradient(circle at 40% 108%,rgba(74,119,255,.10),transparent 30rem),
+    linear-gradient(180deg,var(--page2),var(--page));
+  padding:calc(env(safe-area-inset-top) + 8px) 14px calc(env(safe-area-inset-bottom) + 102px);
+}
+button,input,textarea{font:inherit}button{cursor:pointer;color:inherit}
+button,input,textarea{outline:none}
+button:focus-visible,input:focus-visible,textarea:focus-visible{box-shadow:0 0 0 4px rgba(10,132,255,.16)!important}
+.app{width:min(100%,920px);margin:auto;position:relative}
+
+/* ------------ real web "glass" layer ------------ */
+.glass{
+  --gx:35%;--gy:12%;
+  position:relative;isolation:isolate;
+  border:1px solid var(--glass-edge);
+  background:var(--glass-fill);
+  -webkit-backdrop-filter:blur(22px) saturate(185%) brightness(1.07) contrast(1.015);
+  backdrop-filter:blur(22px) saturate(185%) brightness(1.07) contrast(1.015);
+  box-shadow:var(--glass-shadow);
+  overflow:hidden;
+}
+.glass::before{
+  content:"";position:absolute;inset:0;border-radius:inherit;padding:1px;pointer-events:none;z-index:5;
+  background:
+    conic-gradient(from 205deg at 50% 50%,
+      transparent 0deg,
+      rgba(255,255,255,.12) 26deg,
+      var(--glass-specular) 55deg,
+      rgba(255,255,255,.20) 78deg,
+      transparent 120deg 228deg,
+      rgba(255,255,255,.34) 260deg,
+      rgba(255,255,255,.08) 295deg,
+      transparent 330deg);
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
+  -webkit-mask-composite:xor;
+  mask-composite:exclude;
+  opacity:.82;
+}
+.glass::after{
+  content:"";position:absolute;inset:-25%;pointer-events:none;z-index:-1;
+  background:
+    radial-gradient(circle at var(--gx) var(--gy),
+      rgba(255,255,255,.47) 0,
+      rgba(255,255,255,.16) 14%,
+      transparent 34%);
+  opacity:.28;transition:opacity .22s ease,transform .22s ease;
+  mix-blend-mode:screen;
+}
+.glass.touching::after{opacity:.88;transform:scale(1.04)}
+.glass.touching{transform:scale(.992)}
+.glass-strong{background:var(--glass-fill-strong)}
+.glass-inner{
+  position:absolute;inset:2px;border-radius:inherit;pointer-events:none;z-index:3;
+  box-shadow:
+    inset 1px 1px 1px rgba(255,255,255,.16),
+    inset -1px -1px 1px rgba(10,18,38,.05);
+}
+
+/* Top content */
+.topbar{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;padding:6px 2px 18px}
+.kicker{display:flex;align-items:center;gap:7px;color:var(--blue);font-size:11px;font-weight:850;text-transform:uppercase;letter-spacing:.07em;margin-bottom:7px}
+h1{margin:0;font-size:clamp(35px,9vw,52px);line-height:.93;letter-spacing:-2.4px}
+.subtitle{margin-top:7px;color:var(--muted);font-size:13px}
+.top-actions{display:flex;gap:8px}
+.glass-icon{width:48px;height:48px;border-radius:50%;border-width:1px;display:grid;place-items:center;transition:transform .16s ease}
+.glass-icon:active{transform:scale(.93)}
+.glass-icon svg{width:21px;height:21px}
+
+/* Hero is content, deliberately not glass */
+.hero{
+  position:relative;overflow:hidden;border-radius:35px;min-height:245px;padding:23px;color:white;margin-bottom:12px;
+  background:
+    radial-gradient(circle at 84% 15%,rgba(255,255,255,.30),transparent 10rem),
+    radial-gradient(circle at 90% 90%,rgba(97,224,255,.35),transparent 14rem),
+    linear-gradient(140deg,#3f5ee9 0%,#637aff 49%,#4bc9f4 100%);
+  box-shadow:0 28px 76px rgba(60,89,213,.23)
+}
+.hero::before{content:"";position:absolute;width:270px;height:270px;border:1px solid rgba(255,255,255,.20);border-radius:50%;right:-65px;top:-125px;animation:orbit 10s ease-in-out infinite}
+.hero::after{content:"";position:absolute;width:150px;height:150px;border:1px solid rgba(255,255,255,.12);border-radius:50%;right:72px;bottom:-90px;animation:orbit 13s ease-in-out infinite reverse}
+@keyframes orbit{50%{transform:translate(-19px,15px) scale(1.06)}}
+.hero-grid{position:relative;z-index:2;display:grid;grid-template-columns:minmax(0,1fr) 190px;gap:14px;align-items:center}
+.hero-date{font-size:11px;font-weight:800;opacity:.82;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px}
+.hero h2{margin:0 0 8px;font-size:clamp(27px,6vw,37px);line-height:1;letter-spacing:-1.2px;max-width:520px}
+.hero p{margin:0;max-width:520px;font-size:13px;line-height:1.5;opacity:.88}
+.eye-art{width:100%;filter:drop-shadow(0 20px 28px rgba(15,35,105,.22));animation:eyeFloat 6s ease-in-out infinite}
+@keyframes eyeFloat{50%{transform:translateY(-7px) rotate(.5deg)}}
+
+/* normal content surfaces */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px}
+.stat{background:var(--card);border:1px solid rgba(255,255,255,.9);border-radius:22px;box-shadow:var(--content-shadow);padding:14px 8px;text-align:center}
+.stat b{display:block;font-size:22px;letter-spacing:-.5px;margin-bottom:2px}
+.stat span{display:block;color:var(--muted);font-size:9px;font-weight:850;text-transform:uppercase;letter-spacing:.045em;line-height:1.2}
+.screen{display:none}.screen.active{display:block;animation:screenIn .28s cubic-bezier(.2,.78,.24,1)}
+@keyframes screenIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.surface{background:var(--card);border:1px solid rgba(255,255,255,.9);box-shadow:var(--content-shadow);border-radius:30px}
+.main-grid{display:grid;grid-template-columns:1fr;gap:12px}
+.calendar-card{padding:16px}.cal-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}
+.cal-title{border:0;background:transparent;padding:0;text-align:left}.cal-title strong{display:block;font-size:21px;letter-spacing:-.55px}.cal-title span{display:block;color:var(--muted);font-size:11px;margin-top:2px}
+.month-nav{display:flex;gap:6px}.month-btn{width:42px;height:42px;border:1px solid var(--hair);background:var(--card2);border-radius:15px;font-size:20px}
+.week,.calendar{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px}.week div{text-align:center;color:var(--muted);font-size:9px;font-weight:850;text-transform:uppercase;padding:7px 0}
+.day{position:relative;min-width:0;aspect-ratio:1;border:0;background:transparent;border-radius:16px;font-size:14px;font-weight:760;transition:transform .15s ease,background .15s ease,color .15s ease}
+.day:active{transform:scale(.93)}.day.out{opacity:.24}.day.today{box-shadow:inset 0 0 0 1.5px rgba(10,132,255,.28)}
+.day.done:not(.selected){background:var(--green-soft);color:#247c49}.day.selected{background:linear-gradient(145deg,#0a84ff,#6878ff);color:#fff;box-shadow:0 10px 24px rgba(43,103,221,.2)}
+.relax-badge{position:absolute;top:4px;right:4px;min-width:14px;height:14px;padding:0 3px;border-radius:999px;background:var(--amber);color:white;display:grid;place-items:center;font-size:7px;font-weight:900}
+.entry-card{padding:18px}.entry-head{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;margin-bottom:16px}.entry-head h3{margin:0 0 3px;font-size:23px;letter-spacing:-.65px}.entry-head p{margin:0;color:var(--muted);font-size:11px}
+.state{border:0;border-radius:14px;padding:9px 11px;background:#eef2f7;color:#596577;font-size:11px;font-weight:850}.state.done{background:var(--green-soft);color:#25784a}
+.section{padding:15px 0;border-top:1px solid var(--hair)}.section:first-of-type{border-top:0;padding-top:0}
+.section-label{display:flex;justify-content:space-between;gap:10px;margin-bottom:8px;color:var(--muted);font-size:10px;font-weight:850;text-transform:uppercase;letter-spacing:.045em}
+.field,textarea{width:100%;border:1px solid var(--hair);border-radius:17px;background:var(--card2);color:var(--ink);font-size:16px;padding:13px 14px}
+textarea{min-height:112px;resize:vertical;line-height:1.45}.field:focus,textarea:focus{border-color:rgba(10,132,255,.28);box-shadow:0 0 0 4px rgba(10,132,255,.07)}
+.action{width:100%;min-height:54px;border:0;border-radius:17px;font-size:13px;font-weight:850}.action.train{color:white;background:linear-gradient(135deg,#0a84ff,#6578ff);box-shadow:0 12px 25px rgba(48,108,222,.14)}.action.relax{background:var(--amber-soft);color:#8a590e}
+.times{display:grid;gap:6px;margin-top:9px}.time-row{display:flex;justify-content:space-between;align-items:center;gap:8px;background:var(--card2);border:1px solid var(--hair);border-radius:14px;padding:8px 9px 8px 11px;color:#536076;font-size:11px}.time-row button{width:29px;height:29px;border:0;border-radius:10px;background:#ffe9ed;color:#d34f62;font-weight:900}.empty{color:var(--muted);font-size:11px;padding:2px}
+.feelings{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}.feel{min-width:0;min-height:62px;border:1px solid var(--hair);background:var(--card2);border-radius:15px;padding:6px 2px;font-size:9px;font-weight:800}.feel b{display:block;font-size:20px;line-height:1;margin-bottom:5px}.feel.selected{color:#3855ce;background:#eef1ff;border-color:#d5ddff}
+
+/* analytics */
+.page-title{padding:2px 2px 14px}.page-title h2{margin:0 0 4px;font-size:31px;letter-spacing:-1.2px}.page-title p{margin:0;color:var(--muted);font-size:12px}
+.analytics-grid{display:grid;gap:12px}.analytics-card{padding:18px}.analytics-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:14px}.analytics-head h3{margin:1px 0 0;font-size:19px;letter-spacing:-.5px}.tiny{font-size:10px;color:var(--muted);font-weight:800;text-transform:uppercase;letter-spacing:.05em}
+.segmented{display:flex;gap:2px;background:#eef2f7;border-radius:12px;padding:3px}.segmented button{border:0;background:transparent;border-radius:9px;padding:7px 9px;font-size:10px;color:var(--muted);font-weight:800}.segmented button.on{background:white;color:var(--ink);box-shadow:0 4px 11px rgba(30,45,80,.07)}
+.chart{height:180px;display:flex;align-items:flex-end;gap:6px;padding-top:10px}.bar-col{flex:1;min-width:0;text-align:center}.bar-space{height:140px;display:flex;align-items:flex-end;justify-content:center}.bar{width:min(28px,72%);min-height:3px;border-radius:8px 8px 4px 4px;background:linear-gradient(#53cbff,#0a84ff);transform-origin:bottom;animation:barIn .5s ease both}.bar.relax{background:linear-gradient(#ffd171,#f4a524)}@keyframes barIn{from{transform:scaleY(.06);opacity:.2}to{transform:scaleY(1);opacity:1}}.bar-label{font-size:8px;color:var(--muted);margin-top:6px;white-space:nowrap;overflow:hidden}
+.summary{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}.summary-item{background:var(--card2);border:1px solid var(--hair);border-radius:18px;padding:14px}.summary-item b{display:block;font-size:25px;letter-spacing:-.7px}.summary-item span{font-size:10px;color:var(--muted);font-weight:750}
+.progress-track{height:10px;border-radius:999px;background:#edf1f6;overflow:hidden;margin-top:12px}.progress-track div{height:100%;border-radius:inherit;background:linear-gradient(90deg,#0a84ff,#6e7cff);transition:width .4s ease}
+
+/* iOS-like floating functional layer */
+.scroll-edge{
+  position:fixed;z-index:38;left:0;right:0;bottom:0;height:118px;pointer-events:none;
+  background:linear-gradient(to bottom,transparent,rgba(238,243,251,.36) 48%,rgba(238,243,251,.66));
+  -webkit-mask-image:linear-gradient(to bottom,transparent,#000 50%);
+  mask-image:linear-gradient(to bottom,transparent,#000 50%);
+}
+.dock{
+  position:fixed;z-index:50;left:12px;right:12px;bottom:calc(env(safe-area-inset-bottom) + 9px);
+  width:min(calc(100% - 24px),520px);margin:auto;
+  display:grid;grid-template-columns:62px minmax(0,1fr);gap:9px;align-items:center
+}
+.quick-orb{width:62px;height:62px;border-radius:50%;border-width:1px;font-size:36px;font-weight:300;line-height:1;display:grid;place-items:center;transition:transform .22s cubic-bezier(.2,.8,.2,1)}
+.quick-orb.open{transform:rotate(45deg)}
+.tabbar{height:62px;border-radius:31px;padding:5px;display:grid;grid-template-columns:repeat(3,1fr);gap:3px}
+.tab{min-width:0;border:0;border-radius:25px;background:transparent;color:var(--muted);font-size:9px;font-weight:800;display:grid;place-items:center;align-content:center;gap:2px;transition:transform .15s ease,color .15s ease,background .15s ease}
+.tab svg{width:20px;height:20px}.tab:active{transform:scale(.94)}
+.tab.on{color:#0a84ff;background:rgba(255,255,255,.18);box-shadow:inset 0 .5px 0 rgba(255,255,255,.36)}
+.quick-popover{
+  position:fixed;z-index:49;left:max(12px,calc((100% - min(520px, calc(100% - 24px)))/2));
+  bottom:calc(env(safe-area-inset-bottom) + 80px);
+  width:min(285px,calc(100% - 24px));border-radius:27px;padding:8px;
+  transform-origin:31px calc(100% + 18px);
+  transform:translateY(18px) scale(.72);opacity:0;pointer-events:none;
+  transition:transform .28s cubic-bezier(.18,.88,.24,1.12),opacity .18s ease
+}
+.quick-popover.open{transform:none;opacity:1;pointer-events:auto}
+.pop-row{width:100%;min-height:54px;border:0;border-radius:18px;background:transparent;display:flex;align-items:center;gap:12px;padding:0 13px;text-align:left;font-weight:760}
+.pop-row:active{background:rgba(255,255,255,.15)}
+.pop-icon{width:34px;height:34px;border-radius:12px;display:grid;place-items:center;background:rgba(255,255,255,.16);font-size:16px}.pop-row small{display:block;color:var(--muted);font-weight:500;margin-top:2px}
+.pop-divider{height:1px;background:rgba(255,255,255,.14);margin:2px 10px}
+
+/* more menu, appears from the actual button instead of bottom sheet */
+.menu-popover{
+  position:fixed;z-index:61;width:min(310px,calc(100% - 28px));border-radius:29px;padding:9px;
+  transform-origin:90% 0;transform:scale(.74) translateY(-10px);opacity:0;pointer-events:none;
+  transition:transform .27s cubic-bezier(.18,.88,.24,1.12),opacity .17s ease
+}
+.menu-popover.open{transform:none;opacity:1;pointer-events:auto}
+.menu-popover button{width:100%;min-height:52px;border:0;border-radius:17px;background:transparent;text-align:left;padding:0 13px;font-size:14px;font-weight:650}
+.menu-popover button:active{background:rgba(255,255,255,.15)}.menu-popover .danger{color:var(--red)}
+.backdrop{position:fixed;inset:0;z-index:60;background:rgba(8,12,20,.10);opacity:0;pointer-events:none;transition:opacity .18s ease}.backdrop.open{opacity:1;pointer-events:auto}
+
+@media(min-width:760px){.main-grid{grid-template-columns:1fr 1fr;align-items:start}.entry-card{position:sticky;top:10px}.analytics-grid{grid-template-columns:1fr 1fr}.analytics-card.wide{grid-column:1/-1}}
+@media(max-width:620px){.hero-grid{grid-template-columns:1fr 125px}.stats{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:430px){.hero-grid{grid-template-columns:1fr}.eye-art{display:none}}
+
+@media(prefers-color-scheme:dark){
+  :root{
+    --page:#0d131e;--page2:#111a29;--ink:#f5f7fb;--muted:#9ca8ba;
+    --card:#171f2b;--card2:#1c2532;--hair:rgba(255,255,255,.07);
+    --green-soft:#163528;--amber-soft:#332810;--content-shadow:0 18px 55px rgba(0,0,0,.18);
+
+    /* not a dark slab: translucent neutral glass */
+    --glass-fill:rgba(185,197,218,.105);
+    --glass-fill-strong:rgba(192,204,225,.145);
+    --glass-edge:rgba(255,255,255,.13);
+    --glass-specular:rgba(255,255,255,.72);
+    --glass-specular-soft:rgba(255,255,255,.28);
+    --glass-shadow:0 16px 38px rgba(0,0,0,.30),0 2px 8px rgba(0,0,0,.17),
+      inset 0 1px 1px rgba(255,255,255,.18),inset 0 -1px 1px rgba(0,0,0,.16);
+  }
+  html{color-scheme:dark}
+  body{
+    background:
+      radial-gradient(circle at 10% -8%,rgba(43,125,172,.28),transparent 26rem),
+      radial-gradient(circle at 102% 2%,rgba(79,56,145,.22),transparent 27rem),
+      radial-gradient(circle at 40% 108%,rgba(43,82,150,.14),transparent 30rem),
+      linear-gradient(180deg,var(--page2),var(--page))
+  }
+  .glass{-webkit-backdrop-filter:blur(23px) saturate(190%) brightness(1.1) contrast(1.02);backdrop-filter:blur(23px) saturate(190%) brightness(1.1) contrast(1.02)}
+  .surface,.stat{border-color:rgba(255,255,255,.055)}
+  .state{background:#222c39;color:#b8c1cf}.state.done{background:#163528;color:#8fd3a7}
+  .day.done:not(.selected){background:#163528;color:#8fd3a7}
+  .time-row{color:#c5ccd7}.time-row button{background:#3a2228}
+  .feel.selected{background:#202b52;border-color:#2b3972;color:#bcc8ff}
+  .segmented,.progress-track{background:#222c38}.segmented button.on{background:#303a49;color:white}
+  .tab.on{background:rgba(255,255,255,.075);color:#72b7ff}
+  .pop-icon{background:rgba(255,255,255,.07)}
+  .scroll-edge{background:linear-gradient(to bottom,transparent,rgba(13,19,30,.25) 46%,rgba(13,19,30,.55))}
+}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="topbar">
+  <div>
+    <div class="kicker">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none"><path d="M2.5 12s3.5-5.7 9.5-5.7 9.5 5.7 9.5 5.7-3.5 5.7-9.5 5.7S2.5 12 2.5 12Z" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12" r="3.2" fill="currentColor"/></svg>
+      Denník zraku
+    </div>
+    <h1>Očný tréning</h1>
+    <div class="subtitle">Zaznamenaj málo. Pochop progres.</div>
+  </div>
+  <div class="top-actions">
+    <button class="glass glass-icon" id="todayButton" aria-label="Dnešný deň">
+      <span class="glass-inner"></span>
+      <svg viewBox="0 0 24 24" fill="none"><path d="M7 3v3M17 3v3M4 9h16M6 5h12a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+    </button>
+    <button class="glass glass-icon" id="moreButton" aria-label="Viac možností">
+      <span class="glass-inner"></span>
+      <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.7"/><circle cx="12" cy="12" r="1.7"/><circle cx="19" cy="12" r="1.7"/></svg>
+    </button>
+  </div>
+</header>
+
+<section class="screen active" id="homeScreen">
+  <section class="hero">
+    <div class="hero-grid">
+      <div>
+        <div class="hero-date" id="heroDate"></div>
+        <h2 id="heroTitle">Mal si dnes tréning očí?</h2>
+        <p id="heroText">Jedno ťuknutie uloží presný čas. Detail doplníš len vtedy, keď chceš.</p>
+      </div>
+      <svg class="eye-art" viewBox="0 0 220 160" fill="none" aria-hidden="true">
+        <defs><linearGradient id="iris" x1="70" y1="50" x2="150" y2="120" gradientUnits="userSpaceOnUse"><stop stop-color="#69e1ff"/><stop offset=".48" stop-color="#5c75ff"/><stop offset="1" stop-color="#8a62ff"/></linearGradient></defs>
+        <path d="M14 81C39 41 70 25 110 25s71 16 96 56c-25 40-56 56-96 56S39 121 14 81Z" fill="rgba(255,255,255,.93)"/>
+        <circle cx="110" cy="81" r="38" fill="url(#iris)"/><circle cx="110" cy="81" r="18" fill="#142452"/><circle cx="125" cy="66" r="8" fill="white" fill-opacity=".9"/>
+      </svg>
+    </div>
+  </section>
+
+  <section class="stats">
+    <div class="stat"><b id="streak">0</b><span>Séria dní</span></div>
+    <div class="stat"><b id="monthTraining">0</b><span>Tréningy</span></div>
+    <div class="stat"><b id="monthRelax">0</b><span>Uvoľnenia</span></div>
+    <div class="stat"><b id="activeDays">0</b><span>Aktívne dni</span></div>
+  </section>
+
+  <div class="main-grid">
+    <section class="surface calendar-card">
+      <div class="cal-head">
+        <button class="cal-title" id="calendarToday"><strong id="monthLabel"></strong><span>Ťukni na deň a otvor záznam</span></button>
+        <div class="month-nav"><button class="month-btn" id="prev">‹</button><button class="month-btn" id="next">›</button></div>
+      </div>
+      <div class="week"><div>Po</div><div>Ut</div><div>St</div><div>Št</div><div>Pi</div><div>So</div><div>Ne</div></div>
+      <div class="calendar" id="calendar"></div>
+    </section>
+
+    <section class="surface entry-card">
+      <div class="entry-head">
+        <div><h3 id="dayTitle">Dnes</h3><p id="daySubtitle">Bez záznamu</p></div>
+        <button class="state" id="trainedState">Netrénované</button>
+      </div>
+      <div class="section"><div class="section-label"><span>Na ktorom riadku pracujem</span><span>napr. 7 / 0,7</span></div><input class="field" id="lineInput" placeholder="Zapíš riadok alebo úroveň…"></div>
+      <div class="section"><div class="section-label"><span>Tréning</span><span id="trainingCount">0×</span></div><button class="action train" id="addTraining">＋ Zaznamenať tréning teraz</button><div class="times" id="trainingTimes"></div></div>
+      <div class="section"><div class="section-label"><span>Uvoľnenie očí</span><span id="relaxCount">0×</span></div><button class="action relax" id="addRelax">☀︎ Uvoľnil som oči teraz</button><div class="times" id="relaxTimes"></div></div>
+      <div class="section"><div class="section-label"><span>Ako sa cítim</span></div><div class="feelings" id="feelings">
+        <button class="feel" data-feel="Výborne"><b>😌</b>Výborne</button><button class="feel" data-feel="Dobre"><b>🙂</b>Dobre</button><button class="feel" data-feel="Neutrálne"><b>😐</b>Neutrálne</button><button class="feel" data-feel="Unavene"><b>🥱</b>Unavene</button><button class="feel" data-feel="Zle"><b>😣</b>Zle</button>
+      </div></div>
+      <div class="section"><div class="section-label"><span>Poznámka</span><span id="saveState">Uložené</span></div><textarea id="noteInput" placeholder="Čo si si dnes všimol?"></textarea></div>
+    </section>
+  </div>
+</section>
+
+<section class="screen" id="progressScreen">
+  <div class="page-title"><h2>Progres</h2><p>Tréning a regenerácia v čase.</p></div>
+  <div class="analytics-grid">
+    <section class="surface analytics-card wide">
+      <div class="analytics-head"><div><div class="tiny">Aktivita</div><h3>Tréningy</h3></div><div class="segmented" id="range"><button class="on" data-range="7">7 dní</button><button data-range="30">30 dní</button><button data-range="90">90 dní</button></div></div>
+      <div class="chart" id="trainingChart"></div>
+    </section>
+    <section class="surface analytics-card wide"><div class="analytics-head"><div><div class="tiny">Regenerácia</div><h3>Uvoľnenie očí</h3></div></div><div class="chart" id="relaxChart"></div></section>
+    <section class="surface analytics-card"><div class="analytics-head"><div><div class="tiny">Súhrn obdobia</div><h3 id="periodTitle">Posledných 7 dní</h3></div></div><div class="summary"><div class="summary-item"><b id="periodTraining">0</b><span>tréningov</span></div><div class="summary-item"><b id="periodRelax">0</b><span>uvoľnení</span></div><div class="summary-item"><b id="periodDays">0</b><span>aktívnych dní</span></div><div class="summary-item"><b id="periodFeeling">—</b><span>najčastejší pocit</span></div></div></section>
+    <section class="surface analytics-card"><div class="analytics-head"><div><div class="tiny">Konzistentnosť</div><h3>Tento mesiac</h3></div></div><div class="summary"><div class="summary-item"><b id="monthDays">0</b><span>dní s tréningom</span></div><div class="summary-item"><b id="monthPct">0%</b><span>z celého mesiaca</span></div></div><div class="progress-track"><div id="monthFill"></div></div></section>
+  </div>
+</section>
+
+<section class="screen" id="statsScreen">
+  <div class="page-title"><h2>Štatistiky</h2><p>Týždenný a mesačný obraz návyku.</p></div>
+  <div class="analytics-grid">
+    <section class="surface analytics-card"><div class="analytics-head"><div><div class="tiny">Tento týždeň</div><h3>Týždenný prehľad</h3></div></div><div class="summary"><div class="summary-item"><b id="weekTraining">0</b><span>tréningov</span></div><div class="summary-item"><b id="weekRelax">0</b><span>uvoľnení</span></div><div class="summary-item"><b id="weekDays">0</b><span>aktívnych dní</span></div><div class="summary-item"><b id="weekStreak">0</b><span>aktuálna séria</span></div></div></section>
+    <section class="surface analytics-card"><div class="analytics-head"><div><div class="tiny">Tento mesiac</div><h3>Mesačný prehľad</h3></div></div><div class="summary"><div class="summary-item"><b id="statMonthTraining">0</b><span>tréningov</span></div><div class="summary-item"><b id="statMonthRelax">0</b><span>uvoľnení</span></div><div class="summary-item"><b id="statMonthActive">0</b><span>aktívnych dní</span></div><div class="summary-item"><b id="statMonthPct">0%</b><span>dní s tréningom</span></div></div></section>
+    <section class="surface analytics-card wide"><div class="analytics-head"><div><div class="tiny">História</div><h3>Posledné záznamy</h3></div></div><div id="recent"></div></section>
+  </div>
+</section>
+</div>
+
+<div class="scroll-edge"></div>
+
+<!-- one compact dock, modeled on native iOS grouping -->
+<div class="dock">
+  <button class="glass glass-strong quick-orb" id="quickButton" aria-label="Rýchle akcie"><span class="glass-inner"></span>＋</button>
+  <nav class="glass glass-strong tabbar">
+    <span class="glass-inner"></span>
+    <button class="tab on" data-screen="homeScreen"><svg viewBox="0 0 24 24" fill="none"><path d="M3 11.2 12 4l9 7.2V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1v-8.8Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>Dnes</button>
+    <button class="tab" data-screen="progressScreen"><svg viewBox="0 0 24 24" fill="none"><path d="M4 18 9 12l4 3 7-9M16 6h4v4" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>Progres</button>
+    <button class="tab" data-screen="statsScreen"><svg viewBox="0 0 24 24" fill="none"><path d="M5 20V10M12 20V4M19 20v-7" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg>Štatistiky</button>
+  </nav>
+</div>
+
+<div class="glass glass-strong quick-popover" id="quickPopover">
+  <span class="glass-inner"></span>
+  <button class="pop-row" id="quickTrain"><span class="pop-icon">◉</span><span>Tréning teraz<small>uloží presný čas</small></span></button>
+  <div class="pop-divider"></div>
+  <button class="pop-row" id="quickRelax"><span class="pop-icon">☀︎</span><span>Uvoľniť oči<small>pridá ďalší timestamp</small></span></button>
+</div>
+
+<div class="backdrop" id="backdrop"></div>
+<div class="glass glass-strong menu-popover" id="menuPopover">
+  <span class="glass-inner"></span>
+  <button id="exportCsv">Exportovať všetko do CSV</button>
+  <button id="installHelp">Pridať na plochu iPhonu</button>
+  <button id="jumpToday">Prejsť na dnešok</button>
+  <button class="danger" id="eraseData">Vymazať všetky dáta</button>
+</div>
+
+<script>
+(()=>{
+"use strict";
+const K="ocny-trening-liquid-v6",legacy=["ocny-trening-liquid-v5","eye-training-v4","ocny-trening-sk-v3","ocny-trening-sk-v2"];
+const $=id=>document.getElementById(id);
+const now=new Date();now.setHours(12,0,0,0);const today=toKey(now);
+let db=load(),selected=today,vy=now.getFullYear(),vm=now.getMonth(),daysRange=7,timer;
+
+function toKey(d){return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
+function fromKey(k){const[y,m,d]=k.split("-").map(Number);return new Date(y,m-1,d,12)}
+function blank(){return{line:"",training:[],relax:[],feel:"",note:""}}
+function normalize(v){const o=blank();if(!v||typeof v!=="object")return o;o.line=typeof v.line==="string"?v.line:"";o.note=typeof v.note==="string"?v.note:"";o.feel=typeof v.feel==="string"?v.feel:(typeof v.feeling==="string"?v.feeling:"");o.training=Array.isArray(v.training)?v.training.filter(Boolean):(Array.isArray(v.trainingTimes)?v.trainingTimes.filter(Boolean):[]);o.relax=Array.isArray(v.relax)?v.relax.filter(Boolean):(Array.isArray(v.relaxTimes)?v.relaxTimes.filter(Boolean):[]);return o}
+function load(){let src=null;try{src=JSON.parse(localStorage.getItem(K)||"null")}catch{}if(!src){for(const k of legacy){try{const x=JSON.parse(localStorage.getItem(k)||"null");if(x&&typeof x==="object"){src=x;break}}catch{}}}const out={};if(src&&typeof src==="object")Object.entries(src).forEach(([k,v])=>out[k]=normalize(v));localStorage.setItem(K,JSON.stringify(out));return out}
+function save(){localStorage.setItem(K,JSON.stringify(db))}
+function get(k){if(!db[k])db[k]=blank();return db[k]}
+function empty(v){return!v.line.trim()&&!v.training.length&&!v.relax.length&&!v.feel&&!v.note.trim()}
+function clean(k){if(db[k]&&empty(db[k]))delete db[k]}
+function trained(k){return(db[k]?.training?.length||0)>0}
+function stamp(){return new Date().toISOString()}
+function timeText(i){return new Date(i).toLocaleTimeString("sk-SK",{hour:"2-digit",minute:"2-digit",second:"2-digit"})}
+function dateText(k){return fromKey(k).toLocaleDateString("sk-SK",{weekday:"long",day:"numeric",month:"long",year:"numeric"})}
+function monthText(y,m){const s=new Date(y,m,1).toLocaleDateString("sk-SK",{month:"long",year:"numeric"});return s.charAt(0).toUpperCase()+s.slice(1)}
+
+function add(type,k=selected){get(k)[type].push(stamp());save();render()}
+function remove(type,i){get(selected)[type].splice(i,1);clean(selected);save();render()}
+function streak(){let d=new Date(now);if(!trained(toKey(d)))d.setDate(d.getDate()-1);let n=0;while(trained(toKey(d))){n++;d.setDate(d.getDate()-1)}return n}
+function monthStats(){let t=0,r=0,a=0,td=0;Object.entries(db).forEach(([k,v])=>{const d=fromKey(k);if(d.getFullYear()!==now.getFullYear()||d.getMonth()!==now.getMonth())return;t+=v.training.length;r+=v.relax.length;if(!empty(v))a++;if(v.training.length)td++});return{t,r,a,td}}
+function period(n){const a=[];for(let i=n-1;i>=0;i--){const d=new Date(now);d.setDate(d.getDate()-i);const k=toKey(d),v=db[k]||blank();a.push({k,label:n<=7?d.toLocaleDateString("sk-SK",{weekday:"short"}):(n<=30?String(d.getDate()):((i%7===0||i===0)?String(d.getDate()):"")),t:v.training.length,r:v.relax.length,active:!empty(v),feel:v.feel})}return a}
+
+function hero(){const v=db[today]||blank(),m=monthStats();$("heroDate").textContent="Dnes · "+new Date().toLocaleDateString("sk-SK",{weekday:"long",day:"numeric",month:"long"});$("heroTitle").textContent=trained(today)?"Dnešný tréning je zaznamenaný.":"Mal si dnes tréning očí?";$("heroText").textContent=trained(today)?`Dnes máš ${v.training.length}× tréning a ${v.relax.length}× uvoľnenie očí.`:"Jedno ťuknutie uloží presný čas. Detail doplníš len vtedy, keď chceš.";$("streak").textContent=streak();$("monthTraining").textContent=m.t;$("monthRelax").textContent=m.r;$("activeDays").textContent=m.a}
+
+function calendar(){ $("monthLabel").textContent=monthText(vy,vm);const root=$("calendar");root.innerHTML="";const first=new Date(vy,vm,1),lead=(first.getDay()+6)%7,cur=new Date(vy,vm+1,0).getDate(),prev=new Date(vy,vm,0).getDate();for(let i=0;i<42;i++){let y=vy,m=vm,n,out=false;if(i<lead){out=true;n=prev-lead+i+1;const z=new Date(vy,vm-1,n);y=z.getFullYear();m=z.getMonth()}else if(i>=lead+cur){out=true;n=i-lead-cur+1;const z=new Date(vy,vm+1,n);y=z.getFullYear();m=z.getMonth()}else n=i-lead+1;const k=toKey(new Date(y,m,n,12)),b=document.createElement("button");b.className="day"+(out?" out":"")+(k===today?" today":"")+(trained(k)?" done":"")+(k===selected?" selected":"");b.textContent=n;const rc=db[k]?.relax?.length||0;if(rc){const x=document.createElement("span");x.className="relax-badge";x.textContent=rc>9?"9+":rc;b.append(x)}b.onclick=()=>{selected=k;vy=y;vm=m;render()};root.append(b)}}
+
+function list(root,arr,type){root.innerHTML="";if(!arr.length){root.innerHTML='<div class="empty">Zatiaľ bez záznamu.</div>';return}arr.forEach((x,i)=>{const row=document.createElement("div");row.className="time-row";const s=document.createElement("span");s.textContent=(i+1)+". "+timeText(x);const b=document.createElement("button");b.textContent="×";b.onclick=()=>remove(type,i);row.append(s,b);root.append(row)})}
+function entry(){const v=db[selected]||blank();$("dayTitle").textContent=selected===today?"Dnes":dateText(selected);$("daySubtitle").textContent=trained(selected)?`${v.training.length}× tréning · ${v.relax.length}× uvoľnenie`:(empty(v)?"Bez záznamu":"Záznam bez tréningu");$("trainedState").textContent=trained(selected)?"✓ Trénované":"Netrénované";$("trainedState").classList.toggle("done",trained(selected));if(document.activeElement!==$("lineInput"))$("lineInput").value=v.line;if(document.activeElement!==$("noteInput"))$("noteInput").value=v.note;$("trainingCount").textContent=v.training.length+"×";$("relaxCount").textContent=v.relax.length+"×";list($("trainingTimes"),v.training,"training");list($("relaxTimes"),v.relax,"relax");$("feelings").querySelectorAll(".feel").forEach(b=>b.classList.toggle("selected",b.dataset.feel===v.feel))}
+
+function chart(root,rows,key,relax=false){root.innerHTML="";const max=Math.max(1,...rows.map(x=>x[key]));rows.forEach(x=>{const c=document.createElement("div");c.className="bar-col";const sp=document.createElement("div");sp.className="bar-space";const b=document.createElement("div");b.className="bar"+(relax?" relax":"");b.style.height=Math.max(2,x[key]/max*100)+"%";const l=document.createElement("div");l.className="bar-label";l.textContent=x.label;sp.append(b);c.append(sp,l);root.append(c)})}
+function analytics(){const rows=period(daysRange);chart($("trainingChart"),rows,"t");chart($("relaxChart"),rows,"r",true);$("periodTitle").textContent="Posledných "+daysRange+" dní";$("periodTraining").textContent=rows.reduce((a,x)=>a+x.t,0);$("periodRelax").textContent=rows.reduce((a,x)=>a+x.r,0);$("periodDays").textContent=rows.filter(x=>x.active).length;const f={};rows.forEach(x=>{if(x.feel)f[x.feel]=(f[x.feel]||0)+1});$("periodFeeling").textContent=Object.entries(f).sort((a,b)=>b[1]-a[1])[0]?.[0]||"—";const m=monthStats(),dim=new Date(now.getFullYear(),now.getMonth()+1,0).getDate(),pct=Math.round(m.td/dim*100);$("monthDays").textContent=m.td;$("monthPct").textContent=pct+"%";$("monthFill").style.width=pct+"%";const w=period(7);$("weekTraining").textContent=w.reduce((a,x)=>a+x.t,0);$("weekRelax").textContent=w.reduce((a,x)=>a+x.r,0);$("weekDays").textContent=w.filter(x=>x.active).length;$("weekStreak").textContent=streak();$("statMonthTraining").textContent=m.t;$("statMonthRelax").textContent=m.r;$("statMonthActive").textContent=m.a;$("statMonthPct").textContent=pct+"%";recent()}
+function recent(){const root=$("recent");root.innerHTML="";const keys=Object.keys(db).filter(k=>!empty(db[k])).sort().reverse().slice(0,8);if(!keys.length){root.innerHTML='<div class="empty">Zatiaľ nemáš žiadne záznamy.</div>';return}keys.forEach(k=>{const v=db[k],b=document.createElement("button");b.style.cssText="width:100%;border:0;background:var(--card2);border-radius:16px;padding:11px 12px;margin-bottom:6px;text-align:left;display:flex;justify-content:space-between;gap:10px;color:inherit";const l=document.createElement("span");l.innerHTML='<b style="display:block;font-size:12px">'+fromKey(k).toLocaleDateString("sk-SK",{day:"numeric",month:"long"})+'</b><small style="color:var(--muted)">'+(v.feel||"Bez pocitu")+(v.line?" · "+v.line:"")+'</small>';const r=document.createElement("span");r.style.cssText="font-size:11px;color:var(--muted);white-space:nowrap";r.textContent=v.training.length+"× / "+v.relax.length+"×";b.append(l,r);b.onclick=()=>{selected=k;const d=fromKey(k);vy=d.getFullYear();vm=d.getMonth();switchScreen("homeScreen");render();scrollTo({top:0,behavior:"smooth"})};root.append(b)})}
+function render(){hero();calendar();entry();analytics()}
+
+function saveText(f,v){get(selected)[f]=v;$("saveState").textContent="Ukladám…";clearTimeout(timer);timer=setTimeout(()=>{clean(selected);save();$("saveState").textContent="Uložené";hero();calendar();analytics()},160)}
+function jump(){selected=today;vy=now.getFullYear();vm=now.getMonth();switchScreen("homeScreen");render()}
+function switchScreen(id){document.querySelectorAll(".screen").forEach(x=>x.classList.toggle("active",x.id===id));document.querySelectorAll(".tab").forEach(x=>x.classList.toggle("on",x.dataset.screen===id));closeQuick()}
+
+$("addTraining").onclick=()=>add("training");$("addRelax").onclick=()=>add("relax");
+$("trainedState").onclick=()=>{if(trained(selected)){if(confirm("Odstrániť všetky tréningy z tohto dňa?")){get(selected).training=[];clean(selected);save();render()}}else add("training")}
+$("lineInput").oninput=()=>saveText("line",$("lineInput").value);$("noteInput").oninput=()=>saveText("note",$("noteInput").value);
+$("feelings").onclick=e=>{const b=e.target.closest(".feel");if(!b)return;const v=get(selected);v.feel=v.feel===b.dataset.feel?"":b.dataset.feel;clean(selected);save();render()};
+$("prev").onclick=()=>{const d=new Date(vy,vm-1,1);vy=d.getFullYear();vm=d.getMonth();calendar()};$("next").onclick=()=>{const d=new Date(vy,vm+1,1);vy=d.getFullYear();vm=d.getMonth();calendar()};$("calendarToday").onclick=jump;$("todayButton").onclick=jump;
+document.querySelectorAll(".tab").forEach(b=>b.onclick=()=>{switchScreen(b.dataset.screen);analytics()});
+$("range").onclick=e=>{const b=e.target.closest("[data-range]");if(!b)return;daysRange=+b.dataset.range;$("range").querySelectorAll("button").forEach(x=>x.classList.toggle("on",x===b));analytics()};
+
+/* native-ish quick action popover */
+function closeQuick(){$("quickPopover").classList.remove("open");$("quickButton").classList.remove("open")}
+$("quickButton").onclick=e=>{e.stopPropagation();const open=!$("quickPopover").classList.contains("open");closeMenu();$("quickPopover").classList.toggle("open",open);$("quickButton").classList.toggle("open",open)}
+$("quickTrain").onclick=()=>{selected=today;vy=now.getFullYear();vm=now.getMonth();add("training",today);closeQuick()};
+$("quickRelax").onclick=()=>{selected=today;vy=now.getFullYear();vm=now.getMonth();add("relax",today);closeQuick()};
+
+/* menu morphs from the ellipsis */
+function positionMenu(){const r=$("moreButton").getBoundingClientRect(),m=$("menuPopover");m.style.top=Math.min(innerHeight-250,r.bottom+10)+"px";m.style.right=Math.max(14,innerWidth-r.right)+"px"}
+function closeMenu(){$("menuPopover").classList.remove("open");$("backdrop").classList.remove("open")}
+$("moreButton").onclick=e=>{e.stopPropagation();closeQuick();positionMenu();$("menuPopover").classList.add("open");$("backdrop").classList.add("open")}
+$("backdrop").onclick=closeMenu;$("jumpToday").onclick=()=>{jump();closeMenu()};$("installHelp").onclick=()=>alert("Otvor GitHub Pages adresu v Safari → Zdieľať → Pridať na plochu.");$("eraseData").onclick=()=>{if(confirm("Naozaj vymazať všetky dáta?")){db={};localStorage.removeItem(K);render();closeMenu()}};
+$("exportCsv").onclick=()=>{const H=["Dátum","Riadok / úroveň","Trénoval som","Počet tréningov","Časy tréningu","Počet uvoľnení","Časy uvoľnenia","Pocit","Poznámka"],q=v=>'"'+String(v??"").replace(/"/g,'""')+'"',full=x=>new Date(x).toLocaleString("sk-SK",{day:"2-digit",month:"2-digit",year:"numeric",hour:"2-digit",minute:"2-digit",second:"2-digit"}),rows=Object.keys(db).sort().map(k=>{const v=db[k];return[k,v.line,v.training.length?"Áno":"Nie",v.training.length,v.training.map(full).join(" | "),v.relax.length,v.relax.map(full).join(" | "),v.feel,v.note]});const csv="\ufeff"+[H,...rows].map(r=>r.map(q).join(";")).join("\r\n"),u=URL.createObjectURL(new Blob([csv],{type:"text/csv;charset=utf-8"})),a=document.createElement("a");a.href=u;a.download="ocny-trening-"+today+".csv";document.body.append(a);a.click();a.remove();URL.revokeObjectURL(u);closeMenu()};
+
+/* local light response under finger/pointer */
+function updateGlassPoint(g,e){const r=g.getBoundingClientRect();const x=Math.max(0,Math.min(100,(e.clientX-r.left)/r.width*100));const y=Math.max(0,Math.min(100,(e.clientY-r.top)/r.height*100));g.style.setProperty("--gx",x+"%");g.style.setProperty("--gy",y+"%")}
+document.addEventListener("pointerdown",e=>{const g=e.target.closest(".glass");if(!g)return;updateGlassPoint(g,e);g.classList.add("touching")},{passive:true});
+document.addEventListener("pointermove",e=>{const g=e.target.closest(".glass.touching");if(g)updateGlassPoint(g,e)},{passive:true});
+["pointerup","pointercancel"].forEach(ev=>document.addEventListener(ev,e=>{document.querySelectorAll(".glass.touching").forEach(g=>setTimeout(()=>g.classList.remove("touching"),90))},{passive:true}));
+
+document.addEventListener("click",e=>{if(!e.target.closest("#quickPopover")&&!e.target.closest("#quickButton"))closeQuick()});
+if("serviceWorker"in navigator)addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(()=>{}));
+render();
+})();
+</script>
+</body>
+</html>
